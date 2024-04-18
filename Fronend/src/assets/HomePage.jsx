@@ -46,7 +46,6 @@ const  HomePage = () => {
     
     return (
 <div className=' bottom-0 '>
-
         <BottomNavigation sx={{ width: 500 }} value={value} onChange={handleChange}>
         <BottomNavigationAction
           label="Recents"
