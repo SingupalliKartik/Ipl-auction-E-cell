@@ -3,7 +3,7 @@
 
 
 
-import  React,{useState} from 'react';
+import  React,{useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -18,6 +18,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AccountCircle, GroupOutlined } from '@mui/icons-material';
+import {db} from '../config/Firebase';
+import { doc, onSnapshot,getDocs, collection, } from "firebase/firestore";
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
 
 function refreshMessages() {
   const getRandomInt = (max) => Math.floor(Math.random() * Math.floor(max));
@@ -28,7 +33,26 @@ function refreshMessages() {
 }
 
 const  HomePage = () => {
-  
+
+  const [players, setPlayers] = useState([]);
+useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, 'Player'), (snapshot) => {
+    const newData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // set your state here
+    // this will trigger a re-render of your component
+    setPlayers(newData);
+  });
+
+  // Clean up the subscription on unmount
+  return () => unsubscribe();
+
+
+}, [])
+
+//   const unsub = onSnapshot(doc(db, "Players",""), (doc) => {
+//     console.log("Current data: ", doc.data());
+// });
+// unsub();
     const [value, setValue] = React.useState('recents');
     const ref = React.useRef(null);
     const [messages, setMessages] = React.useState(() => refreshMessages());
@@ -37,7 +61,7 @@ const  HomePage = () => {
       setValue(newValue);
     };
   
-    React.useEffect(() => {
+    useEffect(() => {
       if (ref.current && ref.current.ownerDocument && ref.current.ownerDocument.body) {
         ref.current.ownerDocument.body.scrollTop = 0;
       }
@@ -45,32 +69,105 @@ const  HomePage = () => {
     }, [value, setMessages]);
     
     return (
-<div className=' bottom-0 '>
-        <BottomNavigation sx={{ width: 500 }} value={value} onChange={handleChange}>
-        <BottomNavigationAction
-          label="Recents"
-          value="recents"
-          icon={<RestoreIcon />}
-          />
-        <BottomNavigationAction
-          label="Favorites"
-          value="favorites"
-          icon={<GroupOutlined />}
-          />
-        <BottomNavigationAction
-          label="Nearby"
-          value="nearby"
-          icon={<ArchiveIcon />}
-          />
-        <BottomNavigationAction label="Folder" value="folder" icon={<AccountCircle />} />
-      </BottomNavigation>
-          </div>
+<>
+<div>
+
+
+<ImageList sx={{ width: 500, height: 450 }}>
+{itemData.map((item) => (
+  <ImageListItem key={item.img}>
+    <img
+      srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+      src={`${item.img}?w=248&fit=crop&auto=format`}
+      alt={item.title}
+      loading="lazy"
+    />
+    <ImageListItemBar
+      title={item.title}
+      subtitle={<span>by: {item.author}</span>}
+      position="below"
+    />
+  </ImageListItem>
+))}
+</ImageList>{
+players.map((player)  => {
+  return <div key={2}>
+    <p>{player.Name}</p>
+    <p>{player.Final}</p>
+    <p>{player.isSold}</p>
+    <p>{player.Base}</p>
+  </div>
+})
+
+}</div>
+</>
     );
   
   
     
   }
-  
+  const itemData = [
+    {
+      img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+      title: 'Breakfast',
+      author: '@bkristastucchio',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
+      title: 'Burger',
+      author: '@rollelflex_graphy726',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
+      title: 'Camera',
+      author: '@helloimnik',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
+      title: 'Coffee',
+      author: '@nolanissac',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
+      title: 'Hats',
+      author: '@hjrc33',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
+      title: 'Honey',
+      author: '@arwinneil',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
+      title: 'Basketball',
+      author: '@tjdragotta',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
+      title: 'Fern',
+      author: '@katie_wasserman',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
+      title: 'Mushrooms',
+      author: '@silverdalex',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
+      title: 'Tomato basil',
+      author: '@shelleypauls',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
+      title: 'Sea star',
+      author: '@peterlaster',
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
+      title: 'Bike',
+      author: '@southside_customs',
+    },
+  ];
   const messageExamples = [
     {
       primary: 'Brunch this week?',
